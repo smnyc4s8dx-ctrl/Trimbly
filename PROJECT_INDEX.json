@@ -1,0 +1,157 @@
+{
+  "project": "Trimbly",
+  "generated": "2026-04-27",
+  "description": "Native macOS SwiftUI app that compresses source code into token-efficient representations for AI/LLM consumption.",
+  "platform": {
+    "os": "macOS 14+",
+    "language": "Swift 5.9",
+    "ui": "SwiftUI",
+    "build_systems": ["Swift Package Manager", "Xcode project"]
+  },
+  "package": {
+    "manifest": "Package.swift",
+    "library_target": "TrimbleCore",
+    "library_path": "Trimble",
+    "library_excludes": ["Info.plist", "Assets.xcassets", "Preview Content", "TrimbleApp.swift"],
+    "test_target": "TrimbleTests",
+    "test_path": "Tests/TrimbleTests",
+    "test_status": "declared but directory missing",
+    "external_dependencies": []
+  },
+  "entry_points": {
+    "app_main": "Trimble/TrimbleApp.swift",
+    "root_view": "Trimble/Views/ContentView.swift",
+    "xcode_project": "Trimble.xcodeproj"
+  },
+  "modules": {
+    "Engines": {
+      "path": "Trimble/Engines",
+      "purpose": "Core processing pipeline: filesystem walk, gitignore, dispatch to language optimizers, async progress.",
+      "files": [
+        {"file": "FileProcessor.swift", "exports": ["FileProcessor"], "purpose": "Filesystem walk, text-file detection, path-traversal guard"},
+        {"file": "ContentProcessor.swift", "exports": ["ContentProcessor", "TokenProcessingQueue (actor)", "TokenProcessingProgress", "TokenResult"], "purpose": "ObservableObject orchestrator publishing UI progress"},
+        {"file": "CompressionEngine.swift", "exports": ["CompressionEngine"], "purpose": "Dispatch + cache per-language optimizers, generic fallback"},
+        {"file": "GitIgnoreParser.swift", "exports": ["GitIgnoreParser", "GitIgnorePattern"], "purpose": "gitignore glob to regex, nested support"}
+      ]
+    },
+    "SmartAnalyzers": {
+      "path": "Trimble/SmartAnalyzers",
+      "purpose": "Token counting and semantic structure extraction.",
+      "files": [
+        {"file": "TokenCounter.swift", "exports": ["TokenCounter", "TokenCounter.TokenizerType"], "purpose": "Per-tokenizer-family heuristic token counts"},
+        {"file": "SemanticAnalyzer.swift", "exports": ["SemanticAnalyzer"], "purpose": "Extract imports, classes, functions, public APIs, metrics into CodeStructure"},
+        {"file": "SmartFileAnalyzer.swift", "exports": ["SmartFileAnalyzer"], "purpose": "Auto-exclusion rules for build dirs, lockfiles, binaries"}
+      ]
+    },
+    "LanguageOptimizers": {
+      "path": "Trimble/LanguageOptimizers",
+      "purpose": "Per-language semantic compression strategies.",
+      "base": [
+        {"file": "LanguageOptimizer.swift", "exports": ["LanguageOptimizer (protocol)", "CriticalPattern", "CompressedResult"]},
+        {"file": "LanguageTemplate.swift", "exports": ["TemplateOptimizer"]}
+      ],
+      "implementations": [
+        "SwiftOptimizer", "TypeScriptOptimizer", "PythonOptimizer", "JavaOptimizer",
+        "KotlinOptimizer", "CSharpOptimizer", "CppOptimizer", "GoOptimizer",
+        "RustOptimizer", "RubyOptimizer", "PHPOptimizer", "ObjectiveCOptimizer",
+        "ShellScriptOptimizer", "SQLOptimizer", "CSSOptimizer", "HTMLTemplateOptimizer",
+        "JSONOptimizer", "YAMLOptimizer", "DockerfileOptimizer", "JupyterNotebookOptimizer"
+      ]
+    },
+    "Theming": {
+      "path": "Trimble/Theming",
+      "purpose": "Pluggable theme system used across all views.",
+      "files": [
+        {"file": "ThemeProtocol.swift", "exports": ["TrimbleTheme (protocol)", "AlertSeverity", "AnyButtonStyle", "PrimaryButtonStyleWrapper", "SecondaryButtonStyleWrapper"]},
+        {"file": "ThemeManager.swift", "exports": ["ThemeManager"]},
+        {"file": "ThemeEnvironment.swift", "exports": ["EnvironmentValues.theme"]}
+      ],
+      "themes": ["ClassicTheme", "LiquidGlassTheme"],
+      "components": ["ThemedAlert", "ThemedCard", "ThemedInputField", "ThemedProgressContainer", "ThemedSectionHeader", "ThemedStatCard", "ThemeSettingsView"]
+    },
+    "Views": {
+      "path": "Trimble/Views",
+      "purpose": "SwiftUI views composing the main window.",
+      "files": [
+        "ContentView.swift", "HeaderView.swift", "SourceSelectionView.swift",
+        "AdvancedFileTreeView.swift", "FileTreeManager.swift",
+        "CompressionControlsView.swift", "OutputConfigurationView.swift",
+        "PreviewPanelView.swift", "ProcessingStatusView.swift",
+        "ActionButtonsView.swift", "HelpView.swift",
+        "ErrorDisplayView.swift", "ErrorReportView.swift"
+      ]
+    },
+    "Top-level": {
+      "path": "Trimble",
+      "files": [
+        {"file": "TrimbleApp.swift", "purpose": "App @main entry"},
+        {"file": "Models.swift", "purpose": "Core domain types: CompressionOptions, ProcessingConfiguration, CodeStructure, ProjectStructure, DependencyGraph, etc."},
+        {"file": "Extensions.swift", "purpose": "Foundation/SwiftUI extensions"},
+        {"file": "KnowledgeBase.swift", "purpose": "Static in-app help/FAQ/best-practice content"},
+        {"file": "ErrorReporter.swift", "purpose": "Sanitized error reporting ObservableObject"}
+      ]
+    }
+  },
+  "domain_types": [
+    "OutputFormat", "AIModel", "ProgrammingLanguage", "SemanticCompressionLevel", "FileCategory",
+    "CompressionOptions", "CompressionStrategy", "ProcessingConfiguration",
+    "CompressedCode", "CompressionPreview", "ProcessingError",
+    "CodeStructure", "XcodeProjectStructure", "CodeMetrics", "HierarchicalMap",
+    "ProjectStructure", "DirectoryNode", "FileNode",
+    "DependencyGraph", "LibraryDependency", "Dependency", "CircularDependency",
+    "FileMetrics", "ProjectSummary",
+    "ExcludedDirectoryInfo", "ExclusionCategory"
+  ],
+  "metrics": {
+    "swift_files": 60,
+    "total_loc": 26202,
+    "largest_files": [
+      {"file": "Trimble/LanguageOptimizers/JupyterNotebookOptimizer.swift", "loc": 1211},
+      {"file": "Trimble/LanguageOptimizers/PythonOptimizer.swift", "loc": 1092},
+      {"file": "Trimble/LanguageOptimizers/SwiftOptimizer.swift", "loc": 983},
+      {"file": "Trimble/LanguageOptimizers/ShellScriptOptimizer.swift", "loc": 966},
+      {"file": "Trimble/LanguageOptimizers/ObjectiveCOptimizer.swift", "loc": 907},
+      {"file": "Trimble/LanguageOptimizers/PHPOptimizer.swift", "loc": 900},
+      {"file": "Trimble/LanguageOptimizers/RustOptimizer.swift", "loc": 898},
+      {"file": "Trimble/LanguageOptimizers/RubyOptimizer.swift", "loc": 892},
+      {"file": "Trimble/LanguageOptimizers/SQLOptimizer.swift", "loc": 854},
+      {"file": "Trimble/LanguageOptimizers/KotlinOptimizer.swift", "loc": 824},
+      {"file": "Trimble/LanguageOptimizers/TypeScriptOptimizer.swift", "loc": 744},
+      {"file": "Trimble/LanguageOptimizers/YAMLOptimizer.swift", "loc": 716},
+      {"file": "Trimble/Views/HelpView.swift", "loc": 663},
+      {"file": "Trimble/SmartAnalyzers/SemanticAnalyzer.swift", "loc": 608},
+      {"file": "Trimble/Models.swift", "loc": 606}
+    ]
+  },
+  "tests": {
+    "exists": false,
+    "declared_path": "Tests/TrimbleTests",
+    "note": "Test target declared in Package.swift but directory not present in working tree."
+  },
+  "documentation": {
+    "readme": null,
+    "docs_dir": null,
+    "in_app_help": "Trimble/KnowledgeBase.swift rendered via Trimble/Views/HelpView.swift",
+    "note": "Prior docs/implementation/PHASE_* and CLAUDE.md removed during simplification commit a553f76 (still showing as deleted in git status)."
+  },
+  "configuration_files": [
+    {"file": "Package.swift", "purpose": "SPM manifest"},
+    {"file": "Trimble.xcodeproj/project.pbxproj", "purpose": "Xcode project"},
+    {"file": "Trimble/Assets.xcassets", "purpose": "App icons + accent color"},
+    {"file": ".claude/settings.local.json", "purpose": "Claude Code local permissions"},
+    {"file": ".gitignore", "purpose": "Git ignore rules"}
+  ],
+  "recent_commits": [
+    {"hash": "a553f76", "subject": "Major simplification: Remove MLX/AI middleware, add themeable UI"},
+    {"hash": "842b27a", "subject": "Phase 6: Production Tokenizer Integration - HuggingFace swift-transformers"},
+    {"hash": "e8602bb", "subject": "Fix Query Mode missing source directory selection UI"},
+    {"hash": "49122ca", "subject": "Add Phase 5 validation documentation"},
+    {"hash": "01ad7b5", "subject": "Fix EXC_BREAKPOINT crash in SimpleTokenizer.decode()"}
+  ],
+  "quick_start": [
+    "Open Trimble.xcodeproj in Xcode (macOS 14+)",
+    "Build & run the Trimble scheme to launch the SwiftUI app",
+    "Library-only build: `swift build` from repo root",
+    "Tests: `swift test` (currently no-op — no test files in working tree)"
+  ]
+}
